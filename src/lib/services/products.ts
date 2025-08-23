@@ -37,3 +37,4 @@ export async function getProductById(id: number) {
     return null;
   }
 }
+

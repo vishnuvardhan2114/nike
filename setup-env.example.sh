@@ -39,3 +39,4 @@ echo "🎉 Your Nike Store will be available at http://localhost:3000"
 echo ""
 
 echo "📚 For more details, check the README.md file"
+

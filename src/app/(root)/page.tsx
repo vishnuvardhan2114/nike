@@ -1,7 +1,6 @@
 import Card from "@/components/Card";
 import HeroSection from "@/components/HeroSection";
-import Image from "next/image";
-import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth/actions";
 import React from "react";
 
 const products = [
@@ -35,9 +34,9 @@ const products = [
 ];
 
 const Home = async () => {
-  // const user = await getCurrentUser();
+  const user = await getCurrentUser();
 
-  // console.log('USER:', user);
+  console.log('USER:', user);
 
   return (
     <>
