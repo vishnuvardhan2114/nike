@@ -91,6 +91,7 @@ export default function OrderProcessingClient({ sessionId }: OrderProcessingClie
       </div>
 
       {/* Processing Message */}
+      
       <div className="bg-light-200 p-6 rounded-lg text-center">
         <p className="text-body text-dark-700 mb-4">
           Your payment has been processed successfully. We&apos;re now creating your order.
