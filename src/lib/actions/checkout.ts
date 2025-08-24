@@ -47,12 +47,30 @@ export async function createStripeCheckoutSession(cartId: string) {
     // Prepare line items for Stripe
     const lineItems = cartItemsData.map((item) => {
       const price = parseFloat(item.variant?.salePrice || item.variant?.price || "0");
+      
+      // Convert relative image URL to absolute URL for Stripe
+      let imageUrl = null;
+      if (item.image?.url) {
+        if (item.image.url.startsWith('http')) {
+          // Already an absolute URL
+          imageUrl = item.image.url;
+        } else {
+          // Convert relative URL to absolute URL
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+          if (item.image.url.startsWith('/static/')) {
+            imageUrl = `${baseUrl}/api${item.image.url}`;
+          } else {
+            imageUrl = `${baseUrl}${item.image.url}`;
+          }
+        }
+      }
+      
       return {
         price_data: {
           currency: "usd",
           product_data: {
             name: item.product?.name || "Product",
-            images: item.image ? [item.image.url] : [],
+            images: imageUrl ? [imageUrl] : [],
           },
           unit_amount: Math.round(price * 100), // Convert to cents
         },
@@ -90,6 +108,21 @@ export async function createStripeCheckoutSession(cartId: string) {
     return { success: true, url: session.url };
   } catch (error) {
     console.error("Error creating checkout session:", error);
+    
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('No such price')) {
+        return { success: false, error: "Product pricing error. Please refresh and try again." };
+      }
+      if (error.message.includes('Invalid API key')) {
+        return { success: false, error: "Payment system configuration error. Please contact support." };
+      }
+      if (error.message.includes('Not a valid URL') || error.message.includes('url_invalid')) {
+        return { success: false, error: "Product image configuration error. Please contact support." };
+      }
+      return { success: false, error: error.message };
+    }
+    
     return { success: false, error: "Failed to create checkout session" };
   }
 }

@@ -25,6 +25,15 @@ export default function CartSummary({ cart, user }: CartSummaryProps) {
     }).format(price);
   };
 
+  
+  const handleGuestCheckout = () => {
+    if (!user) {
+      router.push("/sign-in");
+      return;
+    }
+  };
+
+
   const handleCheckout = async () => {
     if (!cart || cart.items.length === 0) {
       alert("Your cart is empty");
@@ -32,7 +41,7 @@ export default function CartSummary({ cart, user }: CartSummaryProps) {
     }
 
     setIsProcessing(true);
-
+    handleGuestCheckout();
     try {
       // Get current cart ID
       const cartResult = await getCurrentCartId();
@@ -61,18 +70,9 @@ export default function CartSummary({ cart, user }: CartSummaryProps) {
     }
   };
 
-  const handleGuestCheckout = () => {
-    if (!user) {
-      // Redirect to sign-in page for guest users
-      router.push("/sign-in");
-      return;
-    }
-  };
-
   return (
     <div className="bg-light-200 p-6 rounded-lg space-y-6">
       <h2 className="text-heading-3 text-dark-900 flex items-center gap-2">
-        <ShoppingCart className="w-6 h-6" />
         Order Summary
       </h2>
 
@@ -99,7 +99,7 @@ export default function CartSummary({ cart, user }: CartSummaryProps) {
         <button
           onClick={handleCheckout}
           disabled={isProcessing || cart.items.length === 0}
-          className="w-full bg-dark-900 text-light-100 py-4 px-6 rounded-full hover:bg-dark-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-body-medium font-medium flex items-center justify-center gap-2"
+          className="w-full bg-dark-900 cursor-pointer text-light-100 py-4 px-6 rounded-full hover:bg-dark-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-body-medium font-medium flex items-center justify-center gap-2"
         >
           {isProcessing ? (
             <>
@@ -108,7 +108,6 @@ export default function CartSummary({ cart, user }: CartSummaryProps) {
             </>
           ) : (
             <>
-              <CreditCard className="w-5 h-5" />
               Proceed to Checkout
             </>
           )}

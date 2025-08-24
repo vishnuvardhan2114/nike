@@ -4,7 +4,6 @@ import { db } from "@/lib/db";
 import { orders, orderItems, payments, carts, cartItems, productVariants, products, productImages } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { stripe } from "@/lib/stripe/client";
-import type { StripeCheckoutSession } from "@/lib/stripe/client";
 
 export async function createOrder(stripeSessionId: string, userId?: string) {
   try {
@@ -126,8 +125,8 @@ export async function getOrder(orderId: string) {
 
 export async function getOrderByStripeSession(sessionId: string) {
   try {
-    // First try to find order by payment transaction ID
-    const orderData = await db
+    // First try to find order by payment transaction ID (payment intent)
+    let orderData = await db
       .select({
         order: orders,
         items: orderItems,
@@ -143,6 +142,30 @@ export async function getOrderByStripeSession(sessionId: string) {
       .leftJoin(productImages, eq(products.id, productImages.productId))
       .leftJoin(payments, eq(orders.id, payments.orderId))
       .where(eq(payments.transactionId, sessionId));
+
+    // If not found by payment intent, try to find by session ID in metadata
+    if (!orderData || orderData.length === 0) {
+      // Get the Stripe session to find the payment intent
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (session.payment_intent) {
+        orderData = await db
+          .select({
+            order: orders,
+            items: orderItems,
+            variant: productVariants,
+            product: products,
+            image: productImages,
+            payment: payments,
+          })
+          .from(orders)
+          .leftJoin(orderItems, eq(orders.id, orderItems.orderId))
+          .leftJoin(productVariants, eq(orderItems.productVariantId, productVariants.id))
+          .leftJoin(products, eq(productVariants.productId, products.id))
+          .leftJoin(productImages, eq(products.id, productImages.productId))
+          .leftJoin(payments, eq(orders.id, payments.orderId))
+          .where(eq(payments.transactionId, session.payment_intent as string));
+      }
+    }
 
     if (orderData && orderData.length > 0) {
       const order = orderData[0].order;
