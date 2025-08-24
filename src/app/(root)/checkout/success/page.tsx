@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getOrderByStripeSession } from "@/lib/actions/orders";
 import OrderSuccess, { Order } from "@/components/OrderSuccess";
+import OrderProcessingClient from "@/components/OrderProcessingClient";
+import { Loader2 } from "lucide-react";
 
 interface CheckoutSuccessPageProps {
   searchParams: {
@@ -13,11 +15,12 @@ async function OrderSuccessWrapper({ sessionId }: { sessionId: string }) {
   const result = await getOrderByStripeSession(sessionId);
   
   if (!result.success || !result.order) {
-    notFound();
+    // If order not found, it might still be processing
+    // Use client-side component to poll for order
+    return <OrderProcessingClient sessionId={sessionId} />;
   }
 
-  return <OrderSuccess 
-  order={result.order as Order} />;
+  return <OrderSuccess order={result.order as Order} />;
 }
 
 export default function CheckoutSuccessPage({ searchParams }: CheckoutSuccessPageProps) {
@@ -35,6 +38,8 @@ export default function CheckoutSuccessPage({ searchParams }: CheckoutSuccessPag
     </div>
   );
 }
+
+
 
 function OrderSuccessSkeleton() {
   return (
