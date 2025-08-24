@@ -85,13 +85,14 @@ export default function OrderProcessingClient({ sessionId }: OrderProcessingClie
         <p className="text-body text-dark-700 mb-4">
           Please wait while we confirm your payment and create your order.
         </p>
+        
         <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-caption font-medium">
           Session ID: {sessionId.slice(0, 8)}...
         </div>
       </div>
 
       {/* Processing Message */}
-      
+
       <div className="bg-light-200 p-6 rounded-lg text-center">
         <p className="text-body text-dark-700 mb-4">
           Your payment has been processed successfully. We&apos;re now creating your order.
