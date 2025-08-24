@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useCartStore } from "@/lib/store/cart";
+import { Menu, ShoppingBag, X } from "lucide-react";
 
 const NAV_LINKS = [
   { label: "Men", href: "/products?gender=men" },
@@ -14,6 +16,16 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { getItemCount, fetchCart, isLoading } = useCartStore();
+  const itemCount = getItemCount();
+
+  useEffect(() => {
+    // Set mounted to true after component mounts on client
+    setMounted(true);
+    // Fetch cart data on component mount
+    fetchCart();
+  }, [fetchCart]);
 
   return (
     <header className="sticky top-0 z-50 bg-light-100">
@@ -39,12 +51,17 @@ export default function Navbar() {
         </ul>
 
         <div className="hidden items-center gap-6 md:flex">
-          <button className="text-body text-dark-900 transition-colors hover:text-dark-700">
-            Search
-          </button>
-          <button className="text-body text-dark-900 transition-colors hover:text-dark-700">
-            My Cart (2)
-          </button>
+          <Link 
+            href="/cart" 
+            className="text-body relative text-dark-900 transition-colors hover:text-dark-700"
+          >
+            <ShoppingBag className="h-5 w-5" />
+            {mounted && itemCount > 0 && (
+              <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-dark-900 text-xs text-light-100">
+                { isLoading ? "..." : itemCount}
+              </span>
+            )}
+          </Link>
         </div>
 
         <button
@@ -55,9 +72,11 @@ export default function Navbar() {
           onClick={() => setOpen((v) => !v)}
         >
           <span className="sr-only">Toggle navigation</span>
-          <span className="mb-1 block h-0.5 w-6 bg-dark-900"></span>
-          <span className="mb-1 block h-0.5 w-6 bg-dark-900"></span>
-          <span className="block h-0.5 w-6 bg-dark-900"></span>
+          {open ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
         </button>
       </nav>
 
@@ -78,8 +97,16 @@ export default function Navbar() {
             </li>
           ))}
           <li className="flex items-center justify-between pt-2">
-            <button className="text-body">Search</button>
-            <button className="text-body">My Cart (2)</button>
+            <Link href="/cart" className="text-body flex items-center relative">
+              <div className="relative ml-1">
+                <ShoppingBag className="h-5 w-5" />
+                {mounted && itemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-dark-900 text-xs text-light-100">
+                    { isLoading ? "..." : itemCount}
+                  </span>
+                )}
+              </div>
+            </Link>
           </li>
         </ul>
       </div>

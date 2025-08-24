@@ -1,42 +1,22 @@
 #!/bin/bash
-# Setup script for Nike Store E-commerce App
 
-echo "🏪 Nike Store Setup"
-echo "==================="
-echo ""
+# Copy this file to setup-env.sh and fill in your actual values
+# Then run: source setup-env.sh
 
-echo "📋 Prerequisites:"
-echo "1. Node.js 18+ installed"
-echo "2. Neon PostgreSQL database account"
-echo "3. Git repository initialized"
-echo ""
+# Database Configuration
+export DATABASE_URL="postgresql://username:password@host:port/database"
 
-echo "🔧 Setup Steps:"
-echo ""
+# Auth Configuration
+export AUTH_SECRET="your-auth-secret-here"
 
-echo "1️⃣  Install dependencies:"
-echo "npm install"
-echo ""
+# Stripe Configuration
+export STRIPE_SECRET_KEY="sk_test_your_stripe_secret_key_here"
+export NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_your_stripe_publishable_key_here"
+export STRIPE_WEBHOOK_SECRET="whsec_your_webhook_secret_here"
 
-echo "2️⃣  Create .env.local file with:"
-echo "DATABASE_URL=\"your_neon_database_url_here\""
-echo "BETTER_AUTH_SECRET=\"your_secret_key_here\""
-echo "BETTER_AUTH_URL=\"http://localhost:3000\""
-echo "NEXTAUTH_URL=\"http://localhost:3000\""
-echo ""
+# App Configuration
+export NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
-echo "3️⃣  Set up database:"
-echo "npm run db:generate"
-echo "npm run db:migrate"
-echo "npm run db:seed"
-echo ""
-
-echo "4️⃣  Start development server:"
-echo "npm run dev"
-echo ""
-
-echo "🎉 Your Nike Store will be available at http://localhost:3000"
-echo ""
-
-echo "📚 For more details, check the README.md file"
+echo "Environment variables set successfully!"
+echo "Make sure to add these to your .env.local file for permanent storage."
 
